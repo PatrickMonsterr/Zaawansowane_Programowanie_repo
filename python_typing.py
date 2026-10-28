@@ -30,8 +30,8 @@ def Funkcja3(x: int):
 # 4) Funkcja przyjmuje 3 liczby typu int i sprawdza, czy suma
 #    dwóch pierwszych jest większa lub równa trzeciej (bool)
 # ==========================================================
-def Funkcja4(x: int, y: int,z: int):
-    if x+y >= z:
+def Funkcja4(x: int, y: int, z: int):
+    if x + y >= z:
         return (True)
     else:
         return (False)
@@ -55,7 +55,8 @@ def Funkcja5(x: list, y: int):
 # ==========================================================
 def Funkcja6(list1: list, list2: list) -> list:
     merged = list1 + list2                    # połączenie list
-    unique = list(dict.fromkeys(merged))      # usunięcie duplikatów (z zachowaniem kolejności)
+    # usunięcie duplikatów (z zachowaniem kolejności)
+    unique = list(dict.fromkeys(merged))
     return [x ** 3 for x in unique]           # podniesienie do potęgi 3
 
 
@@ -64,29 +65,29 @@ def Funkcja6(list1: list, list2: list) -> list:
 # ==========================================================
 
 # 1) Wynik zapisany do zmiennej, następnie wyświetlony
-wynik = Funkcja1("Patryk","Budniok")
-#print(wynik)
+wynik = Funkcja1("Patryk", "Budniok")
+# print(wynik)
 
 # 2) Wynik zapisany do zmiennej, następnie wyświetlony
 wynik2 = Funkcja2(5, 2)
-#print(wynik2)
+# print(wynik2)
 
 # 3) Wynik zapisany do zmiennej, następnie warunek logiczny
 #    wyświetla odpowiedni tekst
 wynik3 = Funkcja3(5)
 
-if wynik3 == True:
+if wynik3:
     print("Liczba Parzysta")
 else:
     print("Liczba Nieparzysta")
 
 # 4)
-wynik4 = Funkcja4(2, 1,4)
-#print(wynik4)
+wynik4 = Funkcja4(2, 1, 4)
+# print(wynik4)
 
 # 5)
-wynik5 = Funkcja5([1,2,3,4,5],9)
-#print(wynik5)
+wynik5 = Funkcja5([1, 2, 3, 4, 5], 9)
+# print(wynik5)
 
 # 6)
 print(Funkcja6([1, 2, 3], [3, 4, 2]))

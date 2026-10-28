@@ -1,7 +1,10 @@
-"""Pobiera 20 pierwszych browarów z Open Brewery DB i wyświetla je jako obiekty Brewery.
+"""Pobiera 20 pierwszych browarow z Open Brewery DB
+i wyswietla je jako obiekty Brewery.
 
-Dokumentacja API: https://www.openbrewerydb.org/documentation
-Wymagana biblioteka: requests  (pip install requests)
+Dokumentacja API:
+https://www.openbrewerydb.org/documentation
+Wymagana biblioteka: requests
+(pip install requests)
 """
 
 from __future__ import annotations
@@ -16,7 +19,7 @@ LIMIT = 20
 
 
 def _to_float(value: Any) -> Optional[float]:
-    """API zwraca współrzędne jako string lub null - zamieniamy na float/None."""
+    """API zwraca wspolrzedne jako string lub null."""
     if value is None or value == "":
         return None
     try:
@@ -41,8 +44,10 @@ class Brewery:
     latitude: Optional[float] = None
     phone: Optional[str] = None
     website_url: Optional[str] = None
-    state: Optional[str] = None   # pole przestarzałe (deprecated), zastąpione state_province
-    street: Optional[str] = None  # pole przestarzałe (deprecated), zastąpione address_1
+    # pole przestarzałe (deprecated), zastąpione state_province
+    state: Optional[str] = None
+    # pole przestarzałe (deprecated), zastąpione address_1
+    street: Optional[str] = None
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> Brewery:

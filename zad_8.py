@@ -1,7 +1,10 @@
-"""Pobiera 20 pierwszych browarów z Open Brewery DB i wyświetla je jako obiekty Brewery.
+"""Pobiera 20 pierwszych browarow z Open Brewery DB
+i wyswietla je jako obiekty Brewery.
 
-Dokumentacja API: https://www.openbrewerydb.org/documentation
-Wymagana biblioteka: requests  (pip install requests)
+Dokumentacja API:
+https://www.openbrewerydb.org/documentation
+Wymagana biblioteka: requests
+(pip install requests)
 """
 
 from __future__ import annotations
@@ -94,7 +97,8 @@ class Brewery:
         )
 
 
-def fetch_breweries(limit: int = LIMIT, city: Optional[str] = None) -> list[dict[str, Any]]:
+def fetch_breweries(limit: int = LIMIT,
+                    city: Optional[str] = None) -> list[dict[str, Any]]:
     params: dict[str, Any] = {"per_page": limit}
     if city:
         params["by_city"] = city
@@ -104,8 +108,13 @@ def fetch_breweries(limit: int = LIMIT, city: Optional[str] = None) -> list[dict
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Pobierz browary z Open Brewery DB")
-    parser.add_argument("--city", type=str, default=None, help="Miasto, do którego ograniczyć pobieranie browarów")
+    parser = argparse.ArgumentParser(
+        description="Pobierz browary z Open Brewery DB")
+    parser.add_argument(
+        "--city",
+        type=str,
+        default=None,
+        help="Miasto, do którego ograniczyć pobieranie browarów")
     args = parser.parse_args()
 
     try:
