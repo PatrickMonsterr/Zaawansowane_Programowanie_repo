@@ -54,7 +54,8 @@ def test_flatten_list():
 
 
 def test_word_frequencies():
-    assert word_frequencies("To be or not to be") == {"to": 2, "be": 2, "or": 1, "not": 1}
+    expected = {"to": 2, "be": 2, "or": 1, "not": 1}
+    assert word_frequencies("To be or not to be") == expected
     assert word_frequencies("Hello, hello!") == {"hello": 2}
     assert word_frequencies("") == {}
     assert word_frequencies("Python Python python") == {"python": 3}
