@@ -4,17 +4,20 @@ import time
 
 QUEUE_FILE = "queue.csv"
 
+
 def read_rows():
     if not os.path.exists(QUEUE_FILE):
         return []
     with open(QUEUE_FILE, newline="", encoding="utf-8") as f:
         return list(csv.DictReader(f))
 
+
 def write_rows(rows):
     with open(QUEUE_FILE, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=["id", "status"])
         writer.writeheader()
         writer.writerows(rows)
+
 
 while True:
     rows = read_rows()
