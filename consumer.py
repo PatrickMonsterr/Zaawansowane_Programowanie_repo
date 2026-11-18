@@ -1,45 +1,41 @@
-﻿import csv
 import os
 import time
 
-QUEUE_FILE = "queue.csv"
+import pika
+
+QUEUE_NAME = "tasks"
+RABBIT_HOST = os.getenv("RABBITMQ_HOST", "localhost")
+RABBIT_PORT = int(os.getenv("RABBITMQ_PORT", "5672"))
 
 
-def read_rows():
-    if not os.path.exists(QUEUE_FILE):
-        return []
-    with open(QUEUE_FILE, newline="", encoding="utf-8") as f:
-        return list(csv.DictReader(f))
+def main():
+    try:
+        connection = pika.BlockingConnection(
+            pika.ConnectionParameters(host=RABBIT_HOST, port=RABBIT_PORT)
+        )
+    except pika.exceptions.AMQPConnectionError:
+        print(
+            f"Nie mozna polaczyc z RabbitMQ ({RABBIT_HOST}:{RABBIT_PORT}). "
+            "Uruchom: docker compose up -d. "
+            "Jesli broker dziala na innym porcie, ustaw RABBITMQ_PORT."
+        )
+        raise SystemExit(1)
+
+    channel = connection.channel()
+    channel.queue_declare(queue=QUEUE_NAME, durable=True)
+    channel.basic_qos(prefetch_count=1)
+
+    def callback(ch, method, properties, body):
+        task = body.decode()
+        print(f"Start zadania {task} (status: in_progress)")
+        time.sleep(2)
+        print(f"Koniec zadania {task} (status: done)")
+        ch.basic_ack(delivery_tag=method.delivery_tag)
+
+    channel.basic_consume(queue=QUEUE_NAME, on_message_callback=callback)
+    print("Consumer oczekuje na zadania...")
+    channel.start_consuming()
 
 
-def write_rows(rows):
-    with open(QUEUE_FILE, "w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=["id", "status"])
-        writer.writeheader()
-        writer.writerows(rows)
-
-
-while True:
-    rows = read_rows()
-    job = None
-    for row in rows:
-        if row["status"] == "pending":
-            row["status"] = "in_progress"
-            job = row["id"]
-            break
-
-    if job is None:
-        time.sleep(5)
-        continue
-
-    write_rows(rows)
-    print(f"Start zadania {job}")
-    time.sleep(30)
-
-    rows = read_rows()
-    for row in rows:
-        if row["id"] == job:
-            row["status"] = "done"
-            break
-    write_rows(rows)
-    print(f"Koniec zadania {job}")
+if __name__ == "__main__":
+    main()
