@@ -1,24 +1,20 @@
-﻿import csv
-import os
+﻿import sqlite3
 import sys
 
-QUEUE_FILE = "queue.csv"
+DB_FILE = "queue.db"
 
 count = int(sys.argv[1]) if len(sys.argv) > 1 else 1
 
-rows = []
-if os.path.exists(QUEUE_FILE):
-    with open(QUEUE_FILE, newline="", encoding="utf-8") as f:
-        rows = list(csv.DictReader(f))
-
-next_id = (max([int(r["id"]) for r in rows], default=0) + 1) if rows else 1
+conn = sqlite3.connect(DB_FILE)
+cur = conn.cursor()
+cur.execute(
+    "CREATE TABLE IF NOT EXISTS jobs ("
+    "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+    "status TEXT NOT NULL)"
+)
 for _ in range(count):
-    rows.append({"id": str(next_id), "status": "pending"})
-    next_id += 1
-
-with open(QUEUE_FILE, "w", newline="", encoding="utf-8") as f:
-    writer = csv.DictWriter(f, fieldnames=["id", "status"])
-    writer.writeheader()
-    writer.writerows(rows)
+    cur.execute("INSERT INTO jobs (status) VALUES ('pending')")
+conn.commit()
+conn.close()
 
 print(f"Dodano {count} zadan.")

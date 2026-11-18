@@ -1,45 +1,59 @@
-﻿import csv
-import os
+﻿import sqlite3
 import time
 
-QUEUE_FILE = "queue.csv"
+DB_FILE = "queue.db"
 
 
-def read_rows():
-    if not os.path.exists(QUEUE_FILE):
-        return []
-    with open(QUEUE_FILE, newline="", encoding="utf-8") as f:
-        return list(csv.DictReader(f))
+def init_db():
+    conn = sqlite3.connect(DB_FILE)
+    cur = conn.cursor()
+    cur.execute(
+        "CREATE TABLE IF NOT EXISTS jobs ("
+        "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+        "status TEXT NOT NULL)"
+    )
+    conn.commit()
+    conn.close()
 
 
-def write_rows(rows):
-    with open(QUEUE_FILE, "w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=["id", "status"])
-        writer.writeheader()
-        writer.writerows(rows)
+def claim_job():
+    conn = sqlite3.connect(DB_FILE, timeout=30)
+    cur = conn.cursor()
+    cur.execute("BEGIN IMMEDIATE")
+    cur.execute(
+        "SELECT id FROM jobs WHERE status = 'pending' ORDER BY id LIMIT 1"
+    )
+    row = cur.fetchone()
+    if row is None:
+        conn.commit()
+        conn.close()
+        return None
+    job_id = row[0]
+    cur.execute(
+        "UPDATE jobs SET status = 'in_progress' WHERE id = ?", (job_id,)
+    )
+    conn.commit()
+    conn.close()
+    return job_id
 
+
+def finish_job(job_id):
+    conn = sqlite3.connect(DB_FILE, timeout=30)
+    cur = conn.cursor()
+    cur.execute("UPDATE jobs SET status = 'done' WHERE id = ?", (job_id,))
+    conn.commit()
+    conn.close()
+
+
+init_db()
 
 while True:
-    rows = read_rows()
-    job = None
-    for row in rows:
-        if row["status"] == "pending":
-            row["status"] = "in_progress"
-            job = row["id"]
-            break
-
-    if job is None:
+    job_id = claim_job()
+    if job_id is None:
         time.sleep(5)
         continue
 
-    write_rows(rows)
-    print(f"Start zadania {job}")
+    print(f"Start zadania {job_id}")
     time.sleep(30)
-
-    rows = read_rows()
-    for row in rows:
-        if row["id"] == job:
-            row["status"] = "done"
-            break
-    write_rows(rows)
-    print(f"Koniec zadania {job}")
+    finish_job(job_id)
+    print(f"Koniec zadania {job_id}")
